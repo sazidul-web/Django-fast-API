@@ -7,6 +7,7 @@ from typing import Optional # for rating api
 from fastapi import FastAPI # for get api
 from fastapi.params import Body # for post api
 from pydantic import BaseModel # for post api validation
+from random import randrange # for CARD api
 
 app = FastAPI()
 
@@ -16,6 +17,41 @@ class Post(BaseModel):
     publis:bool = False
     rating: Optional[int]=None
 
+# jsngo list json   ====CARD
+my_list=[{"id":1,"title":"django developer","body":"App developer expart"},{"id":2,"title":"Sazidul zoon","body":"Saziudl app developer"}]
+# id find funtionn ===================
+def find_post(id):
+    for p in my_list:
+        if p['id']==id:
+            return p
+
+# get fast api   =====CARD
+@app.get("/mypost")
+async def mypost():
+    return {"data": my_list}
+
+# curd post api new id create hoiya data base a sob alada vabe save thake........!
+@app.post("/curd")
+async def curdpost(post: Post):
+    post_dict=post.dict()
+    post_dict['id']=randrange(0,100000000)
+    my_list.append(post_dict)
+    return {"data":post_dict}
+
+# lates post api and path is vary important 
+@app.get("/mypost/latest")
+def get_latest_post():
+    post= my_list[len(my_list)-1]
+    return {"data":post}
+
+
+# get post by id ============================================
+@app.get("/mypost/{id}")
+def mypost(id: int):
+    print(type(id))
+    Post=find_post(id)
+    print(type(id))
+    return {"post_details": Post}
 
 @app.get("/")
 async def root():
