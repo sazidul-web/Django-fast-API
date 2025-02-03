@@ -25,6 +25,13 @@ def find_post(id):
     for p in my_list:
         if p['id']==id:
             return p
+        
+# post delete index serach
+def find_index_post(id):
+    for i,p in enumerate(my_list):
+        if p['id']==id:
+            return i
+        return None
 
 # get fast api   =====CARD
 @app.get("/mypost")
@@ -57,6 +64,35 @@ def mypost(id: int,response: Response):
     # if mypost:
     #     response.status_code=201
     return {"post_details": Post}
+
+# post delete api
+@app.delete("/mypost/delete/{id}")
+def delete_post(id:int):
+    # deleting post
+    # find the index the array that has requared id
+    # my_post.pop(index)
+    index= find_index_post(id)
+    my_list.pop(index)
+    if index is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="You already deleted this content!"
+        )
+    return {"data":"post deleted successfully done"}
+
+@app.put("/mypost/update/{id}")
+async def update_post(id: int, post: Post):
+    index = find_index_post(id)
+    if index is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Update with id: {id} does not exist"
+        )
+    post_dict = post.dict()
+    post_dict['id'] = id
+    my_list[index] = post_dict
+    return {"data": my_list}
+
 
 @app.get("/")
 async def root():
